@@ -1,6 +1,6 @@
 import {
-    useEffect,
-    useState,
+  useEffect,
+  useState,
 } from "react";
 
 import api from "../../shared/api";
@@ -9,1129 +9,1129 @@ import "./InquiryManagement.css";
 
 
 const districts = [
-    "Ampara",
-    "Anuradhapura",
-    "Badulla",
-    "Batticaloa",
-    "Colombo",
-    "Galle",
-    "Gampaha",
-    "Hambantota",
-    "Jaffna",
-    "Kalutara",
-    "Kandy",
-    "Kegalle",
-    "Kilinochchi",
-    "Kurunegala",
-    "Mannar",
-    "Matale",
-    "Matara",
-    "Monaragala",
-    "Mullaitivu",
-    "Nuwara Eliya",
-    "Polonnaruwa",
-    "Puttalam",
-    "Ratnapura",
-    "Trincomalee",
-    "Vavuniya",
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
+  "Colombo",
+  "Galle",
+  "Gampaha",
+  "Hambantota",
+  "Jaffna",
+  "Kalutara",
+  "Kandy",
+  "Kegalle",
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya",
 ];
 
 
 const serviceCategories = [
-    "Identification",
-    "Transport",
-    "Education",
-    "Health",
-    "Business",
-    "Social Services",
-    "Land & Property",
-    "Other",
+  "Identification",
+  "Transport",
+  "Education",
+  "Health",
+  "Business",
+  "Social Services",
+  "Land & Property",
+  "Other",
 ];
 
 
 const statuses = [
-    "All",
-    "Pending",
-    "In Progress",
-    "Resolved",
+  "All",
+  "Pending",
+  "In Progress",
+  "Resolved",
 ];
 
 
 const emptyForm = {
-    fullName: "",
-    email: "",
-    phone: "",
-    district: "",
-    serviceCategory: "",
-    subject: "",
-    message: "",
+  fullName: "",
+  email: "",
+  phone: "",
+  district: "",
+  serviceCategory: "",
+  subject: "",
+  message: "",
 };
 
 
 function InquiryManagement() {
-    const [
-        inquiries,
-        setInquiries,
-    ] = useState([]);
+  const [
+    inquiries,
+    setInquiries,
+  ] = useState([]);
 
 
-    const [
-        search,
-        setSearch,
-    ] = useState("");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
 
-    const [
-        status,
-        setStatus,
-    ] = useState("All");
+  const [
+    status,
+    setStatus,
+  ] = useState("All");
 
 
-    const [
-        loading,
-        setLoading,
-    ] = useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
 
-    const [
-        error,
-        setError,
-    ] = useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
 
-    const [
-        success,
-        setSuccess,
-    ] = useState("");
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
 
 
-    const [
-        referenceNumber,
-        setReferenceNumber,
-    ] = useState("");
+  const [
+    referenceNumber,
+    setReferenceNumber,
+  ] = useState("");
 
 
-    const [
-        showForm,
-        setShowForm,
-    ] = useState(false);
+  const [
+    showForm,
+    setShowForm,
+  ] = useState(false);
 
 
-    const [
-        form,
-        setForm,
-    ] = useState(
-        emptyForm
-    );
+  const [
+    form,
+    setForm,
+  ] = useState(
+    emptyForm
+  );
 
 
-    // ====================================
-    // LOAD INQUIRIES
-    // ====================================
+  // ====================================
+  // LOAD INQUIRIES
+  // ====================================
 
-    const loadInquiries =
-        async () => {
-            try {
-                setLoading(true);
+  const loadInquiries =
+    async () => {
+      try {
+        setLoading(true);
 
-                setError("");
-
-
-                const response =
-                    await api.get(
-                        "/inquiries",
-                        {
-                            params: {
-                                search,
-                                status,
-                            },
-                        }
-                    );
+        setError("");
 
 
-                setInquiries(
-                    response.data.data
-                );
-            } catch (err) {
-                console.error(err);
-
-
-                setError(
-                    "Unable to load inquiries. Please check that the backend is running."
-                );
-            } finally {
-                setLoading(false);
+        const response =
+          await api.get(
+            "/inquiries",
+            {
+              params: {
+                search,
+                status,
+              },
             }
-        };
+          );
 
 
-    useEffect(() => {
-        const timeout =
-            setTimeout(() => {
-                loadInquiries();
-            }, 300);
+        setInquiries(
+          response.data.data
+        );
+      } catch (err) {
+        console.error(err);
 
 
-        return () =>
-            clearTimeout(
-                timeout
-            );
-    }, [
-        search,
-        status,
-    ]);
+        setError(
+          "Unable to load inquiries. Please check that the backend is running."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
 
-    // ====================================
-    // HANDLE INPUT
-    // ====================================
-
-    const handleChange =
-        (event) => {
-            const {
-                name,
-                value,
-            } = event.target;
+  useEffect(() => {
+    const timeout =
+      setTimeout(() => {
+        loadInquiries();
+      }, 300);
 
 
-            setForm(
-                (previous) => ({
-                    ...previous,
-                    [name]: value,
-                })
-            );
-        };
+    return () =>
+      clearTimeout(
+        timeout
+      );
+  }, [
+    search,
+    status,
+  ]);
 
 
-    // ====================================
-    // VALIDATION
-    // ====================================
+  // ====================================
+  // HANDLE INPUT
+  // ====================================
 
-    const validateForm =
-        () => {
-            if (
-                form.fullName
-                    .trim()
-                    .length < 3
-            ) {
-                return "Please enter your full name.";
+  const handleChange =
+    (event) => {
+      const {
+        name,
+        value,
+      } = event.target;
+
+
+      setForm(
+        (previous) => ({
+          ...previous,
+          [name]: value,
+        })
+      );
+    };
+
+
+  // ====================================
+  // VALIDATION
+  // ====================================
+
+  const validateForm =
+    () => {
+      if (
+        form.fullName
+          .trim()
+          .length < 3
+      ) {
+        return "Please enter your full name.";
+      }
+
+
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+      if (
+        !emailPattern.test(
+          form.email
+        )
+      ) {
+        return "Please enter a valid email address.";
+      }
+
+
+      if (
+        form.phone
+          .trim()
+          .length < 9
+      ) {
+        return "Please enter a valid phone number.";
+      }
+
+
+      if (!form.district) {
+        return "Please select your district.";
+      }
+
+
+      if (
+        !form.serviceCategory
+      ) {
+        return "Please select a service category.";
+      }
+
+
+      if (
+        form.subject
+          .trim()
+          .length < 4
+      ) {
+        return "Inquiry subject must contain at least 4 characters.";
+      }
+
+
+      if (
+        form.message
+          .trim()
+          .length < 10
+      ) {
+        return "Please provide more information about your inquiry.";
+      }
+
+
+      return "";
+    };
+
+
+  // ====================================
+  // SUBMIT INQUIRY
+  // ====================================
+
+  const handleSubmit =
+    async (event) => {
+      event.preventDefault();
+
+
+      setError("");
+
+      setSuccess("");
+
+      setReferenceNumber(
+        ""
+      );
+
+
+      const validationError =
+        validateForm();
+
+
+      if (
+        validationError
+      ) {
+        setError(
+          validationError
+        );
+
+        return;
+      }
+
+
+      try {
+        const response =
+          await api.post(
+            "/inquiries",
+            {
+              fullName:
+                form.fullName.trim(),
+
+              email:
+                form.email.trim(),
+
+              phone:
+                form.phone.trim(),
+
+              district:
+                form.district,
+
+              serviceCategory:
+                form.serviceCategory,
+
+              subject:
+                form.subject.trim(),
+
+              message:
+                form.message.trim(),
             }
+          );
 
 
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setSuccess(
+          "Your inquiry was submitted successfully."
+        );
 
 
-            if (
-                !emailPattern.test(
-                    form.email
-                )
-            ) {
-                return "Please enter a valid email address.";
-            }
+        setReferenceNumber(
+          response.data
+            .referenceNumber
+        );
 
 
-            if (
-                form.phone
-                    .trim()
-                    .length < 9
-            ) {
-                return "Please enter a valid phone number.";
-            }
+        setForm(
+          emptyForm
+        );
 
 
-            if (!form.district) {
-                return "Please select your district.";
-            }
+        setShowForm(
+          false
+        );
 
 
-            if (
-                !form.serviceCategory
-            ) {
-                return "Please select a service category.";
-            }
+        await loadInquiries();
+      } catch (err) {
+        console.error(err);
 
 
-            if (
-                form.subject
-                    .trim()
-                    .length < 4
-            ) {
-                return "Inquiry subject must contain at least 4 characters.";
-            }
+        setError(
+          err.response
+            ?.data
+            ?.message ||
+            "Unable to submit your inquiry."
+        );
+      }
+    };
 
 
-            if (
-                form.message
-                    .trim()
-                    .length < 10
-            ) {
-                return "Please provide more information about your inquiry.";
-            }
+  // ====================================
+  // UPDATE STATUS
+  // ====================================
 
+  const handleStatusChange =
+    async (
+      inquiryId,
+      newStatus
+    ) => {
+      try {
+        await api.patch(
+          `/inquiries/${inquiryId}/status`,
+          {
+            status:
+              newStatus,
+          }
+        );
 
-            return "";
-        };
 
+        setSuccess(
+          "Inquiry status updated successfully."
+        );
 
-    // ====================================
-    // SUBMIT INQUIRY
-    // ====================================
 
-    const handleSubmit =
-        async (event) => {
-            event.preventDefault();
+        setError("");
 
 
-            setError("");
+        await loadInquiries();
+      } catch (err) {
+        console.error(err);
 
-            setSuccess("");
 
-            setReferenceNumber(
-                ""
-            );
+        setError(
+          err.response
+            ?.data
+            ?.message ||
+            "Unable to update inquiry status."
+        );
+      }
+    };
 
 
-            const validationError =
-                validateForm();
+  // ====================================
+  // DELETE INQUIRY
+  // ====================================
 
+  const handleDelete =
+    async (inquiry) => {
+      const confirmed =
+        window.confirm(
+          `Are you sure you want to delete inquiry ${inquiry.referenceNumber}?`
+        );
 
-            if (
-                validationError
-            ) {
-                setError(
-                    validationError
-                );
 
-                return;
-            }
+      if (!confirmed) {
+        return;
+      }
 
 
-            try {
-                const response =
-                    await api.post(
-                        "/inquiries",
-                        {
-                            fullName:
-                                form.fullName.trim(),
+      try {
+        await api.delete(
+          `/inquiries/${inquiry._id}`
+        );
 
-                            email:
-                                form.email.trim(),
 
-                            phone:
-                                form.phone.trim(),
+        setSuccess(
+          "Inquiry deleted successfully."
+        );
 
-                            district:
-                            form.district,
 
-                            serviceCategory:
-                            form.serviceCategory,
+        setError("");
 
-                            subject:
-                                form.subject.trim(),
 
-                            message:
-                                form.message.trim(),
-                        }
-                    );
+        await loadInquiries();
+      } catch (err) {
+        console.error(err);
 
 
-                setSuccess(
-                    "Your inquiry was submitted successfully."
-                );
+        setError(
+          "Unable to delete the inquiry."
+        );
+      }
+    };
 
 
-                setReferenceNumber(
-                    response.data
-                        .referenceNumber
-                );
+  // ====================================
+  // DATE FORMAT
+  // ====================================
 
+  const formatDate =
+    (date) => {
+      return new Date(
+        date
+      ).toLocaleDateString(
+        "en-LK",
+        {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }
+      );
+    };
 
-                setForm(
-                    emptyForm
-                );
 
+  return (
+    <main className="page-container">
 
-                setShowForm(
-                    false
-                );
+      <div className="page-header">
 
-
-                await loadInquiries();
-            } catch (err) {
-                console.error(err);
-
-
-                setError(
-                    err.response
-                        ?.data
-                        ?.message ||
-                    "Unable to submit your inquiry."
-                );
-            }
-        };
-
-
-    // ====================================
-    // UPDATE STATUS
-    // ====================================
-
-    const handleStatusChange =
-        async (
-            inquiryId,
-            newStatus
-        ) => {
-            try {
-                await api.patch(
-                    `/inquiries/${inquiryId}/status`,
-                    {
-                        status:
-                        newStatus,
-                    }
-                );
-
-
-                setSuccess(
-                    "Inquiry status updated successfully."
-                );
-
-
-                setError("");
-
-
-                await loadInquiries();
-            } catch (err) {
-                console.error(err);
-
-
-                setError(
-                    err.response
-                        ?.data
-                        ?.message ||
-                    "Unable to update inquiry status."
-                );
-            }
-        };
-
-
-    // ====================================
-    // DELETE INQUIRY
-    // ====================================
-
-    const handleDelete =
-        async (inquiry) => {
-            const confirmed =
-                window.confirm(
-                    `Are you sure you want to delete inquiry ${inquiry.referenceNumber}?`
-                );
-
-
-            if (!confirmed) {
-                return;
-            }
-
-
-            try {
-                await api.delete(
-                    `/inquiries/${inquiry._id}`
-                );
-
-
-                setSuccess(
-                    "Inquiry deleted successfully."
-                );
-
-
-                setError("");
-
-
-                await loadInquiries();
-            } catch (err) {
-                console.error(err);
-
-
-                setError(
-                    "Unable to delete the inquiry."
-                );
-            }
-        };
-
-
-    // ====================================
-    // DATE FORMAT
-    // ====================================
-
-    const formatDate =
-        (date) => {
-            return new Date(
-                date
-            ).toLocaleDateString(
-                "en-LK",
-                {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                }
-            );
-        };
-
-
-    return (
-        <main className="page-container">
-
-            <div className="page-header">
-
-                <div>
+        <div>
 
           <span className="page-label">
             CITIZEN SUPPORT
           </span>
 
-                    <h1>
-                        Inquiry Management
-                    </h1>
+          <h1>
+            Inquiry Management
+          </h1>
 
-                    <p>
-                        Ask questions about Sri Lankan
-                        public services and track
-                        inquiries using a unique
-                        reference number.
-                    </p>
+          <p>
+            Ask questions about Sri Lankan
+            public services and track
+            inquiries using a unique
+            reference number.
+          </p>
 
-                </div>
-
-
-                <button
-                    className="primary-button"
-                    onClick={() =>
-                        setShowForm(
-                            !showForm
-                        )
-                    }
-                >
-                    {showForm
-                        ? "Close Form"
-                        : "+ Submit Inquiry"}
-                </button>
-
-            </div>
+        </div>
 
 
-            {error && (
-                <div className="alert error-alert">
-                    {error}
-                </div>
-            )}
+        <button
+          className="primary-button"
+          onClick={() =>
+            setShowForm(
+              !showForm
+            )
+          }
+        >
+          {showForm
+            ? "Close Form"
+            : "+ Submit Inquiry"}
+        </button>
+
+      </div>
 
 
-            {success && (
-                <div className="alert success-alert">
+      {error && (
+        <div className="alert error-alert">
+          {error}
+        </div>
+      )}
 
-                    <strong>
-                        {success}
-                    </strong>
+
+      {success && (
+        <div className="alert success-alert">
+
+          <strong>
+            {success}
+          </strong>
 
 
-                    {referenceNumber && (
-                        <div className="reference-success">
+          {referenceNumber && (
+            <div className="reference-success">
 
-                            Your reference number:
+              Your reference number:
 
-                            <strong>
-                                {
-                                    referenceNumber
-                                }
-                            </strong>
+              <strong>
+                {
+                  referenceNumber
+                }
+              </strong>
 
-                            <span>
+              <span>
                 Keep this number
                 to track your
                 inquiry.
               </span>
 
-                        </div>
-                    )}
+            </div>
+          )}
 
-                </div>
-            )}
-
-
-            {showForm && (
-
-                <section className="form-card">
-
-                    <div className="form-heading">
-
-                        <h2>
-                            Submit a Public Service Inquiry
-                        </h2>
-
-                        <p>
-                            Tell us what information
-                            you need. All required
-                            fields are marked with *.
-                        </p>
-
-                    </div>
+        </div>
+      )}
 
 
-                    <form
-                        onSubmit={
-                            handleSubmit
+      {showForm && (
+
+        <section className="form-card">
+
+          <div className="form-heading">
+
+            <h2>
+              Submit a Public Service Inquiry
+            </h2>
+
+            <p>
+              Tell us what information
+              you need. All required
+              fields are marked with *.
+            </p>
+
+          </div>
+
+
+          <form
+            onSubmit={
+              handleSubmit
+            }
+          >
+
+            <div className="form-grid">
+
+              <div className="form-group">
+
+                <label>
+                  Full Name *
+                </label>
+
+                <input
+                  type="text"
+                  name="fullName"
+                  value={
+                    form.fullName
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Enter your full name"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Email Address *
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={
+                    form.email
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="example@email.com"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Phone Number *
+                </label>
+
+                <input
+                  type="text"
+                  name="phone"
+                  value={
+                    form.phone
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="0712345678"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  District *
+                </label>
+
+                <select
+                  name="district"
+                  value={
+                    form.district
+                  }
+                  onChange={
+                    handleChange
+                  }
+                >
+
+                  <option value="">
+                    Select district
+                  </option>
+
+                  {districts.map(
+                    (district) => (
+                      <option
+                        key={
+                          district
                         }
-                    >
+                        value={
+                          district
+                        }
+                      >
+                        {
+                          district
+                        }
+                      </option>
+                    )
+                  )}
 
-                        <div className="form-grid">
+                </select>
 
-                            <div className="form-group">
-
-                                <label>
-                                    Full Name *
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="fullName"
-                                    value={
-                                        form.fullName
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    placeholder="Enter your full name"
-                                />
-
-                            </div>
+              </div>
 
 
-                            <div className="form-group">
+              <div className="form-group full-width">
 
-                                <label>
-                                    Email Address *
-                                </label>
+                <label>
+                  Service Category *
+                </label>
 
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={
-                                        form.email
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    placeholder="example@email.com"
-                                />
+                <select
+                  name="serviceCategory"
+                  value={
+                    form.serviceCategory
+                  }
+                  onChange={
+                    handleChange
+                  }
+                >
 
-                            </div>
+                  <option value="">
+                    Select service category
+                  </option>
 
+                  {serviceCategories.map(
+                    (
+                      category
+                    ) => (
+                      <option
+                        key={
+                          category
+                        }
+                        value={
+                          category
+                        }
+                      >
+                        {
+                          category
+                        }
+                      </option>
+                    )
+                  )}
 
-                            <div className="form-group">
+                </select>
 
-                                <label>
-                                    Phone Number *
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    value={
-                                        form.phone
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    placeholder="0712345678"
-                                />
-
-                            </div>
-
-
-                            <div className="form-group">
-
-                                <label>
-                                    District *
-                                </label>
-
-                                <select
-                                    name="district"
-                                    value={
-                                        form.district
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                >
-
-                                    <option value="">
-                                        Select district
-                                    </option>
-
-                                    {districts.map(
-                                        (district) => (
-                                            <option
-                                                key={
-                                                    district
-                                                }
-                                                value={
-                                                    district
-                                                }
-                                            >
-                                                {
-                                                    district
-                                                }
-                                            </option>
-                                        )
-                                    )}
-
-                                </select>
-
-                            </div>
+              </div>
 
 
-                            <div className="form-group full-width">
+              <div className="form-group full-width">
 
-                                <label>
-                                    Service Category *
-                                </label>
+                <label>
+                  Subject *
+                </label>
 
-                                <select
-                                    name="serviceCategory"
-                                    value={
-                                        form.serviceCategory
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                >
+                <input
+                  type="text"
+                  name="subject"
+                  value={
+                    form.subject
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="What is your inquiry about?"
+                />
 
-                                    <option value="">
-                                        Select service category
-                                    </option>
-
-                                    {serviceCategories.map(
-                                        (
-                                            category
-                                        ) => (
-                                            <option
-                                                key={
-                                                    category
-                                                }
-                                                value={
-                                                    category
-                                                }
-                                            >
-                                                {
-                                                    category
-                                                }
-                                            </option>
-                                        )
-                                    )}
-
-                                </select>
-
-                            </div>
+              </div>
 
 
-                            <div className="form-group full-width">
+              <div className="form-group full-width">
 
-                                <label>
-                                    Subject *
-                                </label>
+                <label>
+                  Inquiry Message *
+                </label>
 
-                                <input
-                                    type="text"
-                                    name="subject"
-                                    value={
-                                        form.subject
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    placeholder="What is your inquiry about?"
-                                />
+                <textarea
+                  name="message"
+                  rows="5"
+                  value={
+                    form.message
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Describe the information or assistance you need..."
+                />
 
-                            </div>
+              </div>
 
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Inquiry Message *
-                                </label>
-
-                                <textarea
-                                    name="message"
-                                    rows="5"
-                                    value={
-                                        form.message
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    placeholder="Describe the information or assistance you need..."
-                                />
-
-                            </div>
-
-                        </div>
+            </div>
 
 
-                        <div className="form-actions">
+            <div className="form-actions">
 
-                            <button
-                                type="submit"
-                                className="primary-button"
-                            >
-                                Submit Inquiry
-                            </button>
-
-
-                            <button
-                                type="button"
-                                className="secondary-button"
-                                onClick={() => {
-                                    setShowForm(
-                                        false
-                                    );
-
-                                    setForm(
-                                        emptyForm
-                                    );
-
-                                    setError("");
-                                }}
-                            >
-                                Cancel
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </section>
-
-            )}
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                Submit Inquiry
+              </button>
 
 
-            <section className="search-panel">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  setShowForm(
+                    false
+                  );
 
-                <div className="search-box">
+                  setForm(
+                    emptyForm
+                  );
+
+                  setError("");
+                }}
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+      )}
+
+
+      <section className="search-panel">
+
+        <div className="search-box">
 
           <span>
             🔎
           </span>
 
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={(
-                            event
-                        ) =>
-                            setSearch(
-                                event.target
-                                    .value
-                            )
-                        }
-                        placeholder="Search reference number, name, email or subject..."
-                    />
+          <input
+            type="text"
+            value={search}
+            onChange={(
+              event
+            ) =>
+              setSearch(
+                event.target
+                  .value
+              )
+            }
+            placeholder="Search reference number, name, email or subject..."
+          />
 
-                </div>
-
-
-                <select
-                    className="filter-select"
-                    value={status}
-                    onChange={(
-                        event
-                    ) =>
-                        setStatus(
-                            event.target
-                                .value
-                        )
-                    }
-                >
-
-                    {statuses.map(
-                        (item) => (
-                            <option
-                                key={item}
-                                value={item}
-                            >
-                                {item ===
-                                "All"
-                                    ? "All Statuses"
-                                    : item}
-                            </option>
-                        )
-                    )}
-
-                </select>
-
-            </section>
+        </div>
 
 
-            <div className="results-summary">
+        <select
+          className="filter-select"
+          value={status}
+          onChange={(
+            event
+          ) =>
+            setStatus(
+              event.target
+                .value
+            )
+          }
+        >
 
-                <strong>
-                    {
-                        inquiries.length
-                    }
-                </strong>
+          {statuses.map(
+            (item) => (
+              <option
+                key={item}
+                value={item}
+              >
+                {item ===
+                "All"
+                  ? "All Statuses"
+                  : item}
+              </option>
+            )
+          )}
 
-                {" "}
+        </select>
 
-                inquiry
-                {inquiries.length !==
-                1
-                    ? "ies"
-                    : ""}
-
-                {" "}
-
-                found
-
-            </div>
+      </section>
 
 
-            {loading ? (
+      <div className="results-summary">
 
-                <div className="loading">
-                    Loading inquiries...
-                </div>
+        <strong>
+          {
+            inquiries.length
+          }
+        </strong>
 
-            ) : inquiries.length ===
-            0 ? (
+        {" "}
 
-                <div className="empty-state">
+        inquiry
+        {inquiries.length !==
+        1
+          ? "ies"
+          : ""}
 
-                    <div>
-                        💬
-                    </div>
+        {" "}
 
-                    <h3>
-                        No inquiries found
-                    </h3>
+        found
 
-                    <p>
-                        Try another reference
-                        number or select another
-                        status.
-                    </p>
+      </div>
 
-                </div>
 
-            ) : (
+      {loading ? (
 
-                <div className="inquiry-grid">
+        <div className="loading">
+          Loading inquiries...
+        </div>
 
-                    {inquiries.map(
-                        (inquiry) => (
+      ) : inquiries.length ===
+        0 ? (
 
-                            <article
-                                className="inquiry-card"
-                                key={
-                                    inquiry._id
-                                }
-                            >
+        <div className="empty-state">
 
-                                <div className="inquiry-top">
+          <div>
+            💬
+          </div>
 
-                                    <div>
+          <h3>
+            No inquiries found
+          </h3>
+
+          <p>
+            Try another reference
+            number or select another
+            status.
+          </p>
+
+        </div>
+
+      ) : (
+
+        <div className="inquiry-grid">
+
+          {inquiries.map(
+            (inquiry) => (
+
+              <article
+                className="inquiry-card"
+                key={
+                  inquiry._id
+                }
+              >
+
+                <div className="inquiry-top">
+
+                  <div>
 
                     <span className="reference-label">
                       Reference
                     </span>
 
-                                        <strong className="reference-number">
-                                            {
-                                                inquiry.referenceNumber
-                                            }
-                                        </strong>
+                    <strong className="reference-number">
+                      {
+                        inquiry.referenceNumber
+                      }
+                    </strong>
 
-                                    </div>
+                  </div>
 
 
-                                    <span
-                                        className={`inquiry-status ${inquiry.status
-                                            .toLowerCase()
-                                            .replace(
-                                                " ",
-                                                "-"
-                                            )}`}
-                                    >
+                  <span
+                    className={`inquiry-status ${inquiry.status
+                      .toLowerCase()
+                      .replace(
+                        " ",
+                        "-"
+                      )}`}
+                  >
                     {
-                        inquiry.status
+                      inquiry.status
                     }
                   </span>
 
-                                </div>
+                </div>
 
 
-                                <div className="inquiry-category">
-                                    {
-                                        inquiry.serviceCategory
-                                    }
-                                </div>
+                <div className="inquiry-category">
+                  {
+                    inquiry.serviceCategory
+                  }
+                </div>
 
 
-                                <h2>
-                                    {
-                                        inquiry.subject
-                                    }
-                                </h2>
+                <h2>
+                  {
+                    inquiry.subject
+                  }
+                </h2>
 
 
-                                <p className="inquiry-message">
-                                    {
-                                        inquiry.message
-                                    }
-                                </p>
+                <p className="inquiry-message">
+                  {
+                    inquiry.message
+                  }
+                </p>
 
 
-                                <div className="inquiry-person">
+                <div className="inquiry-person">
 
-                                    <div>
+                  <div>
                     <span>
                       Submitted by
                     </span>
 
-                                        <strong>
-                                            {
-                                                inquiry.fullName
-                                            }
-                                        </strong>
-                                    </div>
+                    <strong>
+                      {
+                        inquiry.fullName
+                      }
+                    </strong>
+                  </div>
 
 
-                                    <div>
+                  <div>
                     <span>
                       District
                     </span>
 
-                                        <strong>
-                                            {
-                                                inquiry.district
-                                            }
-                                        </strong>
-                                    </div>
+                    <strong>
+                      {
+                        inquiry.district
+                      }
+                    </strong>
+                  </div>
 
 
-                                    <div>
+                  <div>
                     <span>
                       Date
                     </span>
 
-                                        <strong>
-                                            {formatDate(
-                                                inquiry.createdAt
-                                            )}
-                                        </strong>
-                                    </div>
-
-                                </div>
-
-
-                                <div className="inquiry-contact">
-
-                                    <p>
-                                        📧 {
-                                        inquiry.email
-                                    }
-                                    </p>
-
-                                    <p>
-                                        📞 {
-                                        inquiry.phone
-                                    }
-                                    </p>
-
-                                </div>
-
-
-                                {inquiry.response && (
-
-                                    <div className="inquiry-response">
-
-                                        <strong>
-                                            Response
-                                        </strong>
-
-                                        <p>
-                                            {
-                                                inquiry.response
-                                            }
-                                        </p>
-
-                                    </div>
-
-                                )}
-
-
-                                <div className="inquiry-actions">
-
-                                    <div className="status-control">
-
-                                        <label>
-                                            Update Status
-                                        </label>
-
-                                        <select
-                                            value={
-                                                inquiry.status
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                handleStatusChange(
-                                                    inquiry._id,
-                                                    event
-                                                        .target
-                                                        .value
-                                                )
-                                            }
-                                        >
-
-                                            <option value="Pending">
-                                                Pending
-                                            </option>
-
-                                            <option value="In Progress">
-                                                In Progress
-                                            </option>
-
-                                            <option value="Resolved">
-                                                Resolved
-                                            </option>
-
-                                        </select>
-
-                                    </div>
-
-
-                                    <button
-                                        className="inquiry-delete-button"
-                                        onClick={() =>
-                                            handleDelete(
-                                                inquiry
-                                            )
-                                        }
-                                    >
-                                        Delete
-                                    </button>
-
-                                </div>
-
-                            </article>
-
-                        )
-                    )}
+                    <strong>
+                      {formatDate(
+                        inquiry.createdAt
+                      )}
+                    </strong>
+                  </div>
 
                 </div>
 
-            )}
 
-        </main>
-    );
+                <div className="inquiry-contact">
+
+                  <p>
+                    📧 {
+                      inquiry.email
+                    }
+                  </p>
+
+                  <p>
+                    📞 {
+                      inquiry.phone
+                    }
+                  </p>
+
+                </div>
+
+
+                {inquiry.response && (
+
+                  <div className="inquiry-response">
+
+                    <strong>
+                      Response
+                    </strong>
+
+                    <p>
+                      {
+                        inquiry.response
+                      }
+                    </p>
+
+                  </div>
+
+                )}
+
+
+                <div className="inquiry-actions">
+
+                  <div className="status-control">
+
+                    <label>
+                      Update Status
+                    </label>
+
+                    <select
+                      value={
+                        inquiry.status
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        handleStatusChange(
+                          inquiry._id,
+                          event
+                            .target
+                            .value
+                        )
+                      }
+                    >
+
+                      <option value="Pending">
+                        Pending
+                      </option>
+
+                      <option value="In Progress">
+                        In Progress
+                      </option>
+
+                      <option value="Resolved">
+                        Resolved
+                      </option>
+
+                    </select>
+
+                  </div>
+
+
+                  <button
+                    className="inquiry-delete-button"
+                    onClick={() =>
+                      handleDelete(
+                        inquiry
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </article>
+
+            )
+          )}
+
+        </div>
+
+      )}
+
+    </main>
+  );
 }
 
 

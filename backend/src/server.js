@@ -1,20 +1,39 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
+const express =
+  require("express");
 
-const connectDB = require("./config/db");
+const cors =
+  require("cors");
 
-const serviceRoutes = require(
+const dotenv =
+  require("dotenv");
+
+
+const connectDB =
+  require("./config/db");
+
+
+const serviceRoutes =
+  require(
     "./modules/serviceDirectory/service.routes"
-);
+  );
 
-const officeRoutes = require(
+
+const officeRoutes =
+  require(
     "./modules/officeDirectory/office.routes"
-);
+  );
 
-const inquiryRoutes = require(
+
+const inquiryRoutes =
+  require(
     "./modules/inquiryManagement/inquiry.routes"
-);
+  );
+
+
+const finderRoutes =
+  require(
+    "./modules/smartFinder/finder.routes"
+  );
 
 
 // ======================================
@@ -28,7 +47,8 @@ dotenv.config();
 // CREATE EXPRESS APPLICATION
 // ======================================
 
-const app = express();
+const app =
+  express();
 
 
 // ======================================
@@ -43,50 +63,72 @@ connectDB();
 // ======================================
 
 const allowedOrigins = [
-    process.env.CLIENT_URL,
-    "http://localhost:5173",
-    "http://localhost:5174",
+  process.env.CLIENT_URL,
 ].filter(Boolean);
 
 
 app.use(
-    cors({
-        origin: function (
-            origin,
-            callback
-        ) {
-            if (!origin) {
-                return callback(
-                    null,
-                    true
-                );
-            }
+  cors({
+    origin: function (
+      origin,
+      callback
+    ) {
+
+      // Allow tools such as Postman
+      // and direct server requests.
+
+      if (!origin) {
+        return callback(
+          null,
+          true
+        );
+      }
 
 
-            if (
-                allowedOrigins.includes(
-                    origin
-                )
-            ) {
-                return callback(
-                    null,
-                    true
-                );
-            }
+      // Allow configured deployed
+      // frontend.
+
+      if (
+        allowedOrigins.includes(
+          origin
+        )
+      ) {
+        return callback(
+          null,
+          true
+        );
+      }
 
 
-            console.log(
-                `Blocked by CORS: ${origin}`
-            );
+      // Allow any localhost Vite port
+      // during hackathon development.
+
+      const isLocalhost =
+        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(
+          origin
+        );
 
 
-            return callback(
-                new Error(
-                    "This origin is not allowed by CORS."
-                )
-            );
-        },
-    })
+      if (isLocalhost) {
+        return callback(
+          null,
+          true
+        );
+      }
+
+
+      console.log(
+        `Blocked by CORS: ${origin}`
+      );
+
+
+      return callback(
+        new Error(
+          "This origin is not allowed by CORS."
+        )
+      );
+    },
+  })
 );
 
 
@@ -95,14 +137,14 @@ app.use(
 // ======================================
 
 app.use(
-    express.json()
+  express.json()
 );
 
 
 app.use(
-    express.urlencoded({
-        extended: true,
-    })
+  express.urlencoded({
+    extended: true,
+  })
 );
 
 
@@ -110,13 +152,21 @@ app.use(
 // ROOT ROUTE
 // ======================================
 
-app.get("/", (req, res) => {
+app.get(
+  "/",
+  (req, res) => {
+
     res.status(200).json({
-        success: true,
-        message:
-            "GovGuide LK API is running successfully",
+      success: true,
+
+      application:
+        "GovGuide LK",
+
+      message:
+        "GovGuide LK API is running successfully",
     });
-});
+  }
+);
 
 
 // ======================================
@@ -124,37 +174,59 @@ app.get("/", (req, res) => {
 // ======================================
 
 app.get(
-    "/api/health",
-    (req, res) => {
-        res.status(200).json({
-            success: true,
-            application:
-                "GovGuide LK",
-            status: "Healthy",
-        });
-    }
+  "/api/health",
+  (req, res) => {
+
+    res.status(200).json({
+      success: true,
+
+      application:
+        "GovGuide LK",
+
+      status:
+        "Healthy",
+    });
+  }
 );
 
 
 // ======================================
-// APPLICATION ROUTES
+// MEMBER 1 - SERVICE DIRECTORY
 // ======================================
 
 app.use(
-    "/api/services",
-    serviceRoutes
+  "/api/services",
+  serviceRoutes
 );
 
 
+// ======================================
+// MEMBER 2 - OFFICE DIRECTORY
+// ======================================
+
 app.use(
-    "/api/offices",
-    officeRoutes
+  "/api/offices",
+  officeRoutes
 );
 
 
+// ======================================
+// MEMBER 3 - INQUIRIES
+// ======================================
+
 app.use(
-    "/api/inquiries",
-    inquiryRoutes
+  "/api/inquiries",
+  inquiryRoutes
+);
+
+
+// ======================================
+// MEMBER 4 - SMART FINDER
+// ======================================
+
+app.use(
+  "/api/finder",
+  finderRoutes
 );
 
 
@@ -163,13 +235,15 @@ app.use(
 // ======================================
 
 app.use(
-    (req, res) => {
-        res.status(404).json({
-            success: false,
-            message:
-                "API endpoint not found.",
-        });
-    }
+  (req, res) => {
+
+    res.status(404).json({
+      success: false,
+
+      message:
+        "API endpoint not found.",
+    });
+  }
 );
 
 
@@ -178,24 +252,26 @@ app.use(
 // ======================================
 
 app.use(
-    (
-        err,
-        req,
-        res,
-        next
-    ) => {
-        console.error(
-            "Server Error:",
-            err.message
-        );
+  (
+    err,
+    req,
+    res,
+    next
+  ) => {
+
+    console.error(
+      "Server Error:",
+      err.message
+    );
 
 
-        res.status(500).json({
-            success: false,
-            message:
-                "Something went wrong on the server.",
-        });
-    }
+    res.status(500).json({
+      success: false,
+
+      message:
+        "Something went wrong on the server.",
+    });
+  }
 );
 
 
@@ -204,45 +280,53 @@ app.use(
 // ======================================
 
 const PORT =
-    process.env.PORT ||
-    5000;
+  process.env.PORT ||
+  5000;
 
 
 app.listen(
-    PORT,
-    () => {
-        console.log(
-            "---------------------------------------"
-        );
+  PORT,
+  () => {
 
-        console.log(
-            "GovGuide LK Backend"
-        );
+    console.log(
+      "---------------------------------------"
+    );
 
-        console.log(
-            `Server running on port ${PORT}`
-        );
+    console.log(
+      "GovGuide LK Backend"
+    );
 
-        console.log(
-            `Local URL: http://localhost:${PORT}`
-        );
+    console.log(
+      `Server running on port ${PORT}`
+    );
 
-        console.log(
-            "Allowed Frontend Origins:"
-        );
+    console.log(
+      `Local URL: http://localhost:${PORT}`
+    );
 
+    console.log(
+      "Modules:"
+    );
 
-        allowedOrigins.forEach(
-            (origin) => {
-                console.log(
-                    `- ${origin}`
-                );
-            }
-        );
+    console.log(
+      "- Service Directory"
+    );
 
+    console.log(
+      "- Office Directory"
+    );
 
-        console.log(
-            "---------------------------------------"
-        );
-    }
+    console.log(
+      "- Inquiry Management"
+    );
+
+    console.log(
+      "- Smart Service Finder"
+    );
+
+    console.log(
+      "---------------------------------------"
+    );
+
+  }
 );
