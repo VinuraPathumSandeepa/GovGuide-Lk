@@ -1,9 +1,7 @@
 const Inquiry = require("./inquiry.model");
 
 
-// ======================================
-// GENERATE REFERENCE NUMBER
-// ======================================
+
 
 const generateReferenceNumber = () => {
     const date = new Date();
