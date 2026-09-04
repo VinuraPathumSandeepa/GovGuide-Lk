@@ -12,9 +12,9 @@ import ComingSoon from "./shared/ComingSoon";
 
 import Home from "./pages/Home";
 
-import ServiceDirectory from "./modules/serviceDirectory/ServiceDirectory";
+import ServiceDirectory from ".Modules/serviceDirectory/ServiceDirectory";
 
-import OfficeDirectory from "./modules/officeDirectory/OfficeDirectory";
+import OfficeDirectory from "./Modules/officeDirectory/OfficeDirectory";
 
 
 function App() {
