@@ -1,18 +1,43 @@
 import {
+  useEffect,
   useState,
 } from "react";
 
-import {
-  Link,
-} from "react-router-dom";
-
 import api from "../../shared/api";
 
-import "./SmartServiceFinder.css";
+import "./InquiryManagement.css";
 
 
-const categories = [
-  "Not Sure",
+const districts = [
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
+  "Colombo",
+  "Galle",
+  "Gampaha",
+  "Hambantota",
+  "Jaffna",
+  "Kalutara",
+  "Kandy",
+  "Kegalle",
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya",
+];
+
+
+const serviceCategories = [
   "Identification",
   "Transport",
   "Education",
@@ -24,95 +49,48 @@ const categories = [
 ];
 
 
-const quickNeeds = [
-  {
-    icon: "🪪",
-    title: "Identity Document",
-    text:
-      "I need help with my NIC or identity document.",
-    category:
-      "Identification",
-  },
-
-  {
-    icon: "🛂",
-    title: "Passport",
-    text:
-      "I need to apply for or renew my passport.",
-    category:
-      "Identification",
-  },
-
-  {
-    icon: "🚗",
-    title: "Driving Licence",
-    text:
-      "I need help with my driving licence.",
-    category:
-      "Transport",
-  },
-
-  {
-    icon: "🎓",
-    title: "Education",
-    text:
-      "I need information about education or student assistance.",
-    category:
-      "Education",
-  },
-
-  {
-    icon: "💼",
-    title: "Start a Business",
-    text:
-      "I want to register or start a business.",
-    category:
-      "Business",
-  },
-
-  {
-    icon: "🏠",
-    title: "Land & Property",
-    text:
-      "I need help with land or property services.",
-    category:
-      "Land & Property",
-  },
+const statuses = [
+  "All",
+  "Pending",
+  "In Progress",
+  "Resolved",
 ];
 
 
-function SmartServiceFinder() {
+const emptyForm = {
+  fullName: "",
+  email: "",
+  phone: "",
+  district: "",
+  serviceCategory: "",
+  subject: "",
+  message: "",
+};
 
+
+function InquiryManagement() {
   const [
-    needDescription,
-    setNeedDescription,
-  ] = useState("");
-
-
-  const [
-    category,
-    setCategory,
-  ] = useState(
-    "Not Sure"
-  );
-
-
-  const [
-    recommendations,
-    setRecommendations,
+    inquiries,
+    setInquiries,
   ] = useState([]);
 
 
   const [
-    detectedCategory,
-    setDetectedCategory,
-  ] = useState(null);
+    search,
+    setSearch,
+  ] = useState("");
+
+
+  const [
+    status,
+    setStatus,
+  ] = useState("All");
 
 
   const [
     loading,
     setLoading,
-  ] = useState(false);
+  ] = useState(true);
 
 
   const [
@@ -122,83 +100,207 @@ function SmartServiceFinder() {
 
 
   const [
-    message,
-    setMessage,
+    success,
+    setSuccess,
   ] = useState("");
 
 
   const [
-    searched,
-    setSearched,
+    referenceNumber,
+    setReferenceNumber,
+  ] = useState("");
+
+
+  const [
+    showForm,
+    setShowForm,
   ] = useState(false);
 
 
+  const [
+    form,
+    setForm,
+  ] = useState(
+    emptyForm
+  );
+
+
   // ====================================
-  // QUICK NEED
+  // LOAD INQUIRIES
   // ====================================
 
-  const handleQuickNeed =
-    (item) => {
+  const loadInquiries =
+    async () => {
+      try {
+        setLoading(true);
 
-      setNeedDescription(
-        item.text
+        setError("");
+
+
+        const response =
+          await api.get(
+            "/inquiries",
+            {
+              params: {
+                search,
+                status,
+              },
+            }
+          );
+
+
+        setInquiries(
+          response.data.data
+        );
+      } catch (err) {
+        console.error(err);
+
+
+        setError(
+          "Unable to load inquiries. Please check that the backend is running."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+  useEffect(() => {
+    const timeout =
+      setTimeout(() => {
+        loadInquiries();
+      }, 300);
+
+
+    return () =>
+      clearTimeout(
+        timeout
       );
+  }, [
+    search,
+    status,
+  ]);
 
 
-      setCategory(
-        item.category
+  // ====================================
+  // HANDLE INPUT
+  // ====================================
+
+  const handleChange =
+    (event) => {
+      const {
+        name,
+        value,
+      } = event.target;
+
+
+      setForm(
+        (previous) => ({
+          ...previous,
+          [name]: value,
+        })
       );
-
-
-      setRecommendations(
-        []
-      );
-
-
-      setDetectedCategory(
-        null
-      );
-
-
-      setSearched(false);
-
-      setError("");
-
-      setMessage("");
     };
 
 
   // ====================================
-  // FIND SERVICE
+  // VALIDATION
   // ====================================
 
-  const handleFindService =
-    async (event) => {
+  const validateForm =
+    () => {
+      if (
+        form.fullName
+          .trim()
+          .length < 3
+      ) {
+        return "Please enter your full name.";
+      }
 
+
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+      if (
+        !emailPattern.test(
+          form.email
+        )
+      ) {
+        return "Please enter a valid email address.";
+      }
+
+
+      if (
+        form.phone
+          .trim()
+          .length < 9
+      ) {
+        return "Please enter a valid phone number.";
+      }
+
+
+      if (!form.district) {
+        return "Please select your district.";
+      }
+
+
+      if (
+        !form.serviceCategory
+      ) {
+        return "Please select a service category.";
+      }
+
+
+      if (
+        form.subject
+          .trim()
+          .length < 4
+      ) {
+        return "Inquiry subject must contain at least 4 characters.";
+      }
+
+
+      if (
+        form.message
+          .trim()
+          .length < 10
+      ) {
+        return "Please provide more information about your inquiry.";
+      }
+
+
+      return "";
+    };
+
+
+  // ====================================
+  // SUBMIT INQUIRY
+  // ====================================
+
+  const handleSubmit =
+    async (event) => {
       event.preventDefault();
 
 
       setError("");
 
-      setMessage("");
+      setSuccess("");
 
-      setRecommendations(
-        []
+      setReferenceNumber(
+        ""
       );
 
-      setDetectedCategory(
-        null
-      );
+
+      const validationError =
+        validateForm();
 
 
       if (
-        needDescription
-          .trim()
-          .length < 3
+        validationError
       ) {
-
         setError(
-          "Please describe the government service or assistance you need."
+          validationError
         );
 
         return;
@@ -206,41 +308,57 @@ function SmartServiceFinder() {
 
 
       try {
-
-        setLoading(true);
-
-        setSearched(true);
-
-
         const response =
           await api.post(
-            "/finder/recommend",
+            "/inquiries",
             {
-              needDescription:
-                needDescription.trim(),
+              fullName:
+                form.fullName.trim(),
 
-              category,
+              email:
+                form.email.trim(),
+
+              phone:
+                form.phone.trim(),
+
+              district:
+                form.district,
+
+              serviceCategory:
+                form.serviceCategory,
+
+              subject:
+                form.subject.trim(),
+
+              message:
+                form.message.trim(),
             }
           );
 
 
-        setRecommendations(
-          response.data.data
+        setSuccess(
+          "Your inquiry was submitted successfully."
         );
 
 
-        setDetectedCategory(
+        setReferenceNumber(
           response.data
-            .detectedCategory
+            .referenceNumber
         );
 
 
-        setMessage(
-          response.data.message
+        setForm(
+          emptyForm
         );
 
+
+        setShowForm(
+          false
+        );
+
+
+        await loadInquiries();
       } catch (err) {
-
         console.error(err);
 
 
@@ -248,579 +366,767 @@ function SmartServiceFinder() {
           err.response
             ?.data
             ?.message ||
-          "Unable to find services. Please check that the backend is running."
+            "Unable to submit your inquiry."
         );
-
-      } finally {
-
-        setLoading(false);
-
       }
     };
 
 
   // ====================================
-  // RESET
+  // UPDATE STATUS
   // ====================================
 
-  const handleReset = () => {
+  const handleStatusChange =
+    async (
+      inquiryId,
+      newStatus
+    ) => {
+      try {
+        await api.patch(
+          `/inquiries/${inquiryId}/status`,
+          {
+            status:
+              newStatus,
+          }
+        );
 
-    setNeedDescription("");
 
-    setCategory(
-      "Not Sure"
-    );
+        setSuccess(
+          "Inquiry status updated successfully."
+        );
 
-    setRecommendations(
-      []
-    );
 
-    setDetectedCategory(
-      null
-    );
+        setError("");
 
-    setError("");
 
-    setMessage("");
+        await loadInquiries();
+      } catch (err) {
+        console.error(err);
 
-    setSearched(false);
 
-  };
+        setError(
+          err.response
+            ?.data
+            ?.message ||
+            "Unable to update inquiry status."
+        );
+      }
+    };
+
+
+  // ====================================
+  // DELETE INQUIRY
+  // ====================================
+
+  const handleDelete =
+    async (inquiry) => {
+      const confirmed =
+        window.confirm(
+          `Are you sure you want to delete inquiry ${inquiry.referenceNumber}?`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+        await api.delete(
+          `/inquiries/${inquiry._id}`
+        );
+
+
+        setSuccess(
+          "Inquiry deleted successfully."
+        );
+
+
+        setError("");
+
+
+        await loadInquiries();
+      } catch (err) {
+        console.error(err);
+
+
+        setError(
+          "Unable to delete the inquiry."
+        );
+      }
+    };
+
+
+  // ====================================
+  // DATE FORMAT
+  // ====================================
+
+  const formatDate =
+    (date) => {
+      return new Date(
+        date
+      ).toLocaleDateString(
+        "en-LK",
+        {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }
+      );
+    };
 
 
   return (
     <main className="page-container">
 
-      <div className="finder-header">
+      <div className="page-header">
 
-        <span className="page-label">
-          SMART ASSISTANCE
-        </span>
+        <div>
 
-        <h1>
-          Smart Service Finder
-        </h1>
+          <span className="page-label">
+            CITIZEN SUPPORT
+          </span>
 
-        <p>
-          Not sure which government
-          service you need? Describe
-          your situation and GovGuide
-          LK will suggest the most
-          relevant services from the
-          directory.
-        </p>
+          <h1>
+            Inquiry Management
+          </h1>
+
+          <p>
+            Ask questions about Sri Lankan
+            public services and track
+            inquiries using a unique
+            reference number.
+          </p>
+
+        </div>
+
+
+        <button
+          className="primary-button"
+          onClick={() =>
+            setShowForm(
+              !showForm
+            )
+          }
+        >
+          {showForm
+            ? "Close Form"
+            : "+ Submit Inquiry"}
+        </button>
 
       </div>
 
 
-      <section className="finder-intro-card">
+      {error && (
+        <div className="alert error-alert">
+          {error}
+        </div>
+      )}
 
-        <div className="finder-intro-icon">
-          ✨
+
+      {success && (
+        <div className="alert success-alert">
+
+          <strong>
+            {success}
+          </strong>
+
+
+          {referenceNumber && (
+            <div className="reference-success">
+
+              Your reference number:
+
+              <strong>
+                {
+                  referenceNumber
+                }
+              </strong>
+
+              <span>
+                Keep this number
+                to track your
+                inquiry.
+              </span>
+
+            </div>
+          )}
+
+        </div>
+      )}
+
+
+      {showForm && (
+
+        <section className="form-card">
+
+          <div className="form-heading">
+
+            <h2>
+              Submit a Public Service Inquiry
+            </h2>
+
+            <p>
+              Tell us what information
+              you need. All required
+              fields are marked with *.
+            </p>
+
+          </div>
+
+
+          <form
+            onSubmit={
+              handleSubmit
+            }
+          >
+
+            <div className="form-grid">
+
+              <div className="form-group">
+
+                <label>
+                  Full Name *
+                </label>
+
+                <input
+                  type="text"
+                  name="fullName"
+                  value={
+                    form.fullName
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Enter your full name"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Email Address *
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={
+                    form.email
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="example@email.com"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Phone Number *
+                </label>
+
+                <input
+                  type="text"
+                  name="phone"
+                  value={
+                    form.phone
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="0712345678"
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  District *
+                </label>
+
+                <select
+                  name="district"
+                  value={
+                    form.district
+                  }
+                  onChange={
+                    handleChange
+                  }
+                >
+
+                  <option value="">
+                    Select district
+                  </option>
+
+                  {districts.map(
+                    (district) => (
+                      <option
+                        key={
+                          district
+                        }
+                        value={
+                          district
+                        }
+                      >
+                        {
+                          district
+                        }
+                      </option>
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+
+              <div className="form-group full-width">
+
+                <label>
+                  Service Category *
+                </label>
+
+                <select
+                  name="serviceCategory"
+                  value={
+                    form.serviceCategory
+                  }
+                  onChange={
+                    handleChange
+                  }
+                >
+
+                  <option value="">
+                    Select service category
+                  </option>
+
+                  {serviceCategories.map(
+                    (
+                      category
+                    ) => (
+                      <option
+                        key={
+                          category
+                        }
+                        value={
+                          category
+                        }
+                      >
+                        {
+                          category
+                        }
+                      </option>
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+
+              <div className="form-group full-width">
+
+                <label>
+                  Subject *
+                </label>
+
+                <input
+                  type="text"
+                  name="subject"
+                  value={
+                    form.subject
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="What is your inquiry about?"
+                />
+
+              </div>
+
+
+              <div className="form-group full-width">
+
+                <label>
+                  Inquiry Message *
+                </label>
+
+                <textarea
+                  name="message"
+                  rows="5"
+                  value={
+                    form.message
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Describe the information or assistance you need..."
+                />
+
+              </div>
+
+            </div>
+
+
+            <div className="form-actions">
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                Submit Inquiry
+              </button>
+
+
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  setShowForm(
+                    false
+                  );
+
+                  setForm(
+                    emptyForm
+                  );
+
+                  setError("");
+                }}
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+      )}
+
+
+      <section className="search-panel">
+
+        <div className="search-box">
+
+          <span>
+            🔎
+          </span>
+
+          <input
+            type="text"
+            value={search}
+            onChange={(
+              event
+            ) =>
+              setSearch(
+                event.target
+                  .value
+              )
+            }
+            placeholder="Search reference number, name, email or subject..."
+          />
+
         </div>
 
 
-        <div>
+        <select
+          className="filter-select"
+          value={status}
+          onChange={(
+            event
+          ) =>
+            setStatus(
+              event.target
+                .value
+            )
+          }
+        >
 
-          <h2>
-            How does it work?
-          </h2>
+          {statuses.map(
+            (item) => (
+              <option
+                key={item}
+                value={item}
+              >
+                {item ===
+                "All"
+                  ? "All Statuses"
+                  : item}
+              </option>
+            )
+          )}
 
-          <p>
-            Tell us what you need.
-            The Smart Service Finder
-            compares your request with
-            available public services
-            and ranks the closest
-            matches.
-          </p>
-
-        </div>
+        </select>
 
       </section>
 
 
-      <section className="quick-needs-section">
+      <div className="results-summary">
 
-        <div className="finder-section-heading">
+        <strong>
+          {
+            inquiries.length
+          }
+        </strong>
 
-          <h2>
-            Common needs
-          </h2>
+        {" "}
+
+        inquiry
+        {inquiries.length !==
+        1
+          ? "ies"
+          : ""}
+
+        {" "}
+
+        found
+
+      </div>
+
+
+      {loading ? (
+
+        <div className="loading">
+          Loading inquiries...
+        </div>
+
+      ) : inquiries.length ===
+        0 ? (
+
+        <div className="empty-state">
+
+          <div>
+            💬
+          </div>
+
+          <h3>
+            No inquiries found
+          </h3>
 
           <p>
-            Select one or describe
-            your own situation below.
+            Try another reference
+            number or select another
+            status.
           </p>
 
         </div>
 
+      ) : (
 
-        <div className="quick-needs-grid">
+        <div className="inquiry-grid">
 
-          {quickNeeds.map(
-            (item) => (
+          {inquiries.map(
+            (inquiry) => (
 
-              <button
-                type="button"
-                className="quick-need-card"
-                key={item.title}
-                onClick={() =>
-                  handleQuickNeed(
-                    item
-                  )
+              <article
+                className="inquiry-card"
+                key={
+                  inquiry._id
                 }
               >
 
-                <span className="quick-need-icon">
-                  {item.icon}
-                </span>
+                <div className="inquiry-top">
 
-                <strong>
-                  {item.title}
-                </strong>
+                  <div>
 
-              </button>
+                    <span className="reference-label">
+                      Reference
+                    </span>
+
+                    <strong className="reference-number">
+                      {
+                        inquiry.referenceNumber
+                      }
+                    </strong>
+
+                  </div>
+
+
+                  <span
+                    className={`inquiry-status ${inquiry.status
+                      .toLowerCase()
+                      .replace(
+                        " ",
+                        "-"
+                      )}`}
+                  >
+                    {
+                      inquiry.status
+                    }
+                  </span>
+
+                </div>
+
+
+                <div className="inquiry-category">
+                  {
+                    inquiry.serviceCategory
+                  }
+                </div>
+
+
+                <h2>
+                  {
+                    inquiry.subject
+                  }
+                </h2>
+
+
+                <p className="inquiry-message">
+                  {
+                    inquiry.message
+                  }
+                </p>
+
+
+                <div className="inquiry-person">
+
+                  <div>
+                    <span>
+                      Submitted by
+                    </span>
+
+                    <strong>
+                      {
+                        inquiry.fullName
+                      }
+                    </strong>
+                  </div>
+
+
+                  <div>
+                    <span>
+                      District
+                    </span>
+
+                    <strong>
+                      {
+                        inquiry.district
+                      }
+                    </strong>
+                  </div>
+
+
+                  <div>
+                    <span>
+                      Date
+                    </span>
+
+                    <strong>
+                      {formatDate(
+                        inquiry.createdAt
+                      )}
+                    </strong>
+                  </div>
+
+                </div>
+
+
+                <div className="inquiry-contact">
+
+                  <p>
+                    📧 {
+                      inquiry.email
+                    }
+                  </p>
+
+                  <p>
+                    📞 {
+                      inquiry.phone
+                    }
+                  </p>
+
+                </div>
+
+
+                {inquiry.response && (
+
+                  <div className="inquiry-response">
+
+                    <strong>
+                      Response
+                    </strong>
+
+                    <p>
+                      {
+                        inquiry.response
+                      }
+                    </p>
+
+                  </div>
+
+                )}
+
+
+                <div className="inquiry-actions">
+
+                  <div className="status-control">
+
+                    <label>
+                      Update Status
+                    </label>
+
+                    <select
+                      value={
+                        inquiry.status
+                      }
+                      onChange={(
+                        event
+                      ) =>
+                        handleStatusChange(
+                          inquiry._id,
+                          event
+                            .target
+                            .value
+                        )
+                      }
+                    >
+
+                      <option value="Pending">
+                        Pending
+                      </option>
+
+                      <option value="In Progress">
+                        In Progress
+                      </option>
+
+                      <option value="Resolved">
+                        Resolved
+                      </option>
+
+                    </select>
+
+                  </div>
+
+
+                  <button
+                    className="inquiry-delete-button"
+                    onClick={() =>
+                      handleDelete(
+                        inquiry
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </article>
 
             )
           )}
 
         </div>
-
-      </section>
-
-
-      <section className="finder-form-card">
-
-        <div className="form-heading">
-
-          <h2>
-            What do you need help with?
-          </h2>
-
-          <p>
-            You can use simple
-            everyday language.
-          </p>
-
-        </div>
-
-
-        {error && (
-
-          <div className="alert error-alert">
-            {error}
-          </div>
-
-        )}
-
-
-        <form
-          onSubmit={
-            handleFindService
-          }
-        >
-
-          <div className="form-group">
-
-            <label>
-              Describe your need *
-            </label>
-
-            <textarea
-              rows="5"
-              value={
-                needDescription
-              }
-              onChange={(event) =>
-                setNeedDescription(
-                  event.target.value
-                )
-              }
-              placeholder="Example: I lost my NIC and need to know how to get a replacement."
-            />
-
-            <small>
-              Include important words
-              such as NIC, passport,
-              licence, university or
-              business registration.
-            </small>
-
-          </div>
-
-
-          <div className="finder-category">
-
-            <div className="form-group">
-
-              <label>
-                Service Category
-              </label>
-
-              <select
-                value={category}
-                onChange={(event) =>
-                  setCategory(
-                    event.target.value
-                  )
-                }
-              >
-
-                {categories.map(
-                  (item) => (
-
-                    <option
-                      key={item}
-                      value={item}
-                    >
-                      {item}
-                    </option>
-
-                  )
-                )}
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-          <div className="finder-form-actions">
-
-            <button
-              type="submit"
-              className="primary-button"
-              disabled={loading}
-            >
-
-              {loading
-                ? "Finding Services..."
-                : "✨ Find My Service"}
-
-            </button>
-
-
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-
-          </div>
-
-        </form>
-
-      </section>
-
-
-      {searched &&
-        !loading && (
-
-        <section className="finder-results">
-
-          <div className="finder-results-header">
-
-            <div>
-
-              <span className="page-label">
-                RECOMMENDATIONS
-              </span>
-
-              <h2>
-                Recommended Services
-              </h2>
-
-            </div>
-
-
-            {detectedCategory && (
-
-              <div className="detected-category">
-
-                Smart category:
-
-                <strong>
-                  {
-                    detectedCategory
-                  }
-                </strong>
-
-              </div>
-
-            )}
-
-          </div>
-
-
-          {message && (
-
-            <div className="finder-message">
-              {message}
-            </div>
-
-          )}
-
-
-          {recommendations.length ===
-          0 ? (
-
-            <div className="empty-state">
-
-              <div>
-                🔍
-              </div>
-
-              <h3>
-                No close service found
-              </h3>
-
-              <p>
-                Try providing more
-                details or selecting a
-                service category.
-              </p>
-
-
-              <Link
-                to="/services"
-                className="primary-button finder-browse-button"
-              >
-                Browse All Services
-              </Link>
-
-            </div>
-
-          ) : (
-
-            <div className="finder-results-grid">
-
-              {recommendations.map(
-                (
-                  service,
-                  index
-                ) => (
-
-                  <article
-                    className="finder-result-card"
-                    key={
-                      service._id
-                    }
-                  >
-
-                    <div className="finder-result-top">
-
-                      <div className="recommendation-rank">
-
-                        #{index + 1}
-
-                      </div>
-
-
-                      <span
-                        className={`match-badge ${
-                          service.matchLevel ===
-                          "Strong Match"
-                            ? "strong-match"
-                            : service.matchLevel ===
-                              "Good Match"
-                            ? "good-match"
-                            : "possible-match"
-                        }`}
-                      >
-
-                        {
-                          service.matchLevel
-                        }
-
-                      </span>
-
-                    </div>
-
-
-                    <span className="category-badge">
-
-                      {
-                        service.category
-                      }
-
-                    </span>
-
-
-                    <h2>
-                      {
-                        service.name
-                      }
-                    </h2>
-
-
-                    <p className="department">
-
-                      🏛️ {
-                        service.department
-                      }
-
-                    </p>
-
-
-                    <p className="finder-service-description">
-
-                      {
-                        service.description
-                      }
-
-                    </p>
-
-
-                    {service.matchReasons
-                      ?.length > 0 && (
-
-                      <div className="why-match">
-
-                        <h4>
-                          Why this may
-                          match
-                        </h4>
-
-
-                        <ul>
-
-                          {service.matchReasons.map(
-                            (
-                              reason,
-                              reasonIndex
-                            ) => (
-
-                              <li
-                                key={
-                                  reasonIndex
-                                }
-                              >
-                                ✓ {reason}
-                              </li>
-
-                            )
-                          )}
-
-                        </ul>
-
-                      </div>
-
-                    )}
-
-
-                    <div className="finder-info-grid">
-
-                      <div>
-
-                        <span>
-                          Fee
-                        </span>
-
-                        <strong>
-
-                          {service.fee ===
-                          0
-                            ? "Free"
-                            : `LKR ${Number(
-                                service.fee
-                              ).toLocaleString()}`}
-
-                        </strong>
-
-                      </div>
-
-
-                      <div>
-
-                        <span>
-                          Processing Time
-                        </span>
-
-                        <strong>
-                          {
-                            service.processingTime
-                          }
-                        </strong>
-
-                      </div>
-
-                    </div>
-
-
-                    <div className="finder-documents">
-
-                      <h4>
-                        Required Documents
-                      </h4>
-
-
-                      {service
-                        .requiredDocuments
-                        ?.length > 0 ? (
-
-                        <ul>
-
-                          {service.requiredDocuments.map(
-                            (
-                              document,
-                              documentIndex
-                            ) => (
-
-                              <li
-                                key={
-                                  documentIndex
-                                }
-                              >
-                                {
-                                  document
-                                }
-                              </li>
-
-                            )
-                          )}
-
-                        </ul>
-
-                      ) : (
-
-                        <p>
-                          No documents
-                          specified.
-                        </p>
-
-                      )}
-
-                    </div>
-
-
-                    <div className="finder-eligibility">
-
-                      <strong>
-                        Eligibility:
-                      </strong>
-
-                      {" "}
-
-                      {
-                        service.eligibility
-                      }
-
-                    </div>
-
-                  </article>
-
-                )
-              )}
-
-            </div>
-
-          )}
-
-        </section>
 
       )}
 
@@ -829,4 +1135,4 @@ function SmartServiceFinder() {
 }
 
 
-export default SmartServiceFinder;
+export default InquiryManagement;

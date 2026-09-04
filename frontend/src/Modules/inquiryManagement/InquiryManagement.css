@@ -1,0 +1,306 @@
+.inquiry-grid {
+    display: grid;
+    grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+.inquiry-card {
+    background: white;
+    border: 1px solid #e4e9f0;
+    border-radius: 15px;
+    padding: 25px;
+
+    box-shadow:
+            0 6px 24px
+            rgba(22, 52, 98, 0.04);
+}
+
+
+.inquiry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+
+.reference-label {
+    display: block;
+    color: #8993a4;
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+
+
+.reference-number {
+    color: #173d77;
+    font-size: 14px;
+}
+
+
+.inquiry-status {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+
+.inquiry-status.pending {
+    background: #fff6dc;
+    color: #936617;
+}
+
+
+.inquiry-status.in-progress {
+    background: #e9f3ff;
+    color: #28629b;
+}
+
+
+.inquiry-status.resolved {
+    background: #eaf8ef;
+    color: #26764a;
+}
+
+
+.inquiry-category {
+    display: inline-block;
+
+    background: #eef4fc;
+    color: #315f95;
+
+    border-radius: 7px;
+
+    padding: 5px 8px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    margin-bottom: 14px;
+}
+
+
+.inquiry-card h2 {
+    color: #19375f;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+
+.inquiry-message {
+    color: #616d7f;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+
+.inquiry-person {
+    display: grid;
+    grid-template-columns:
+    repeat(3, 1fr);
+
+    margin-top: 20px;
+
+    padding-top: 16px;
+    padding-bottom: 16px;
+
+    border-top:
+            1px solid #edf0f4;
+
+    border-bottom:
+            1px solid #edf0f4;
+
+    gap: 10px;
+}
+
+
+.inquiry-person span {
+    display: block;
+    color: #8993a4;
+    font-size: 10px;
+    margin-bottom: 4px;
+}
+
+
+.inquiry-person strong {
+    color: #3b485e;
+    font-size: 12px;
+}
+
+
+.inquiry-contact {
+    margin-top: 15px;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 14px;
+}
+
+
+.inquiry-contact p {
+    color: #657185;
+    font-size: 12px;
+}
+
+
+.inquiry-response {
+    margin-top: 17px;
+
+    border-radius: 9px;
+
+    background: #f5f8fc;
+
+    padding: 13px;
+}
+
+
+.inquiry-response strong {
+    color: #34445c;
+    font-size: 12px;
+}
+
+
+.inquiry-response p {
+    margin-top: 5px;
+    color: #657185;
+    line-height: 1.6;
+    font-size: 12px;
+}
+
+
+.inquiry-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 15px;
+
+    margin-top: 20px;
+}
+
+
+.status-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+.status-control label {
+    color: #637084;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.status-control select {
+    border:
+            1px solid #d7dde7;
+
+    border-radius: 7px;
+
+    padding: 8px 10px;
+
+    background: white;
+
+    color: #34445c;
+
+    outline: none;
+}
+
+
+.inquiry-delete-button {
+    border: none;
+
+    border-radius: 7px;
+
+    background: #fff0f0;
+
+    color: #a54141;
+
+    padding: 9px 12px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.inquiry-delete-button:hover {
+    background: #f9dddd;
+}
+
+
+.reference-success {
+    margin-top: 9px;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-weight: normal;
+}
+
+
+.reference-success strong {
+    color: #173d77;
+
+    background: white;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+}
+
+
+.reference-success span {
+    font-size: 12px;
+}
+
+
+@media (
+max-width: 900px
+) {
+
+    .inquiry-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (
+max-width: 600px
+) {
+
+    .inquiry-person {
+        grid-template-columns: 1fr;
+    }
+
+
+    .inquiry-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .status-control select {
+        width: 100%;
+    }
+
+
+    .inquiry-delete-button {
+        width: 100%;
+    }
+
+}
