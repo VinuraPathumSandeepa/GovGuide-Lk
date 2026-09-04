@@ -4,83 +4,210 @@ const dotenv = require("dotenv");
 
 const connectDB = require("./config/db");
 
+const serviceRoutes = require(
+  "./modules/serviceDirectory/service.routes"
+);
+
+
+// ======================================
+// ENVIRONMENT CONFIGURATION
+// ======================================
+
 dotenv.config();
+
+
+// ======================================
+// CREATE EXPRESS APPLICATION
+// ======================================
 
 const app = express();
 
 
-// ==============================
-// Database
-// ==============================
+// ======================================
+// DATABASE CONNECTION
+// ======================================
 
 connectDB();
 
 
-// ==============================
-// Middleware
-// ==============================
+// ======================================
+// CORS CONFIGURATION
+// ======================================
+
+// We allow both common Vite development ports.
+// This avoids problems when Vite automatically
+// changes from 5173 to 5174.
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
+    origin: function (origin, callback) {
+
+      // Allow requests without an origin
+      // such as Postman or direct API testing.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log(
+        `Blocked by CORS: ${origin}`
+      );
+
+      return callback(
+        new Error(
+          "This origin is not allowed by CORS."
+        )
+      );
+    },
   })
 );
 
+
+// ======================================
+// MIDDLEWARE
+// ======================================
+
 app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 
-// ==============================
-// Test Route
-// ==============================
+// ======================================
+// TEST ROUTE
+// ======================================
 
 app.get("/", (req, res) => {
+
   res.status(200).json({
     success: true,
-    message: "GovGuide LK API is running successfully",
+    message:
+      "GovGuide LK API is running successfully",
   });
+
 });
 
 
-// ==============================
-// Health Check
-// ==============================
+// ======================================
+// HEALTH CHECK
+// ======================================
 
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    application: "GovGuide LK",
-    status: "Healthy",
-  });
-});
+app.get(
+  "/api/health",
+  (req, res) => {
+
+    res.status(200).json({
+      success: true,
+      application: "GovGuide LK",
+      status: "Healthy",
+    });
+
+  }
+);
 
 
-// ==============================
-// Error Handling
-// ==============================
+// ======================================
+// APPLICATION ROUTES
+// ======================================
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
+app.use(
+  "/api/services",
+  serviceRoutes
+);
 
-  res.status(500).json({
+
+// ======================================
+// 404 HANDLER
+// ======================================
+
+app.use((req, res) => {
+
+  res.status(404).json({
     success: false,
-    message: "Something went wrong on the server.",
+    message:
+      "API endpoint not found.",
   });
+
 });
 
 
-// ==============================
-// Server
-// ==============================
+// ======================================
+// GLOBAL ERROR HANDLER
+// ======================================
 
-const PORT = process.env.PORT || 5000;
+app.use(
+  (err, req, res, next) => {
 
-app.listen(PORT, () => {
-  console.log("-----------------------------------");
-  console.log("GovGuide LK Backend");
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Local URL: http://localhost:${PORT}`);
-  console.log("-----------------------------------");
-});
+    console.error(
+      "Server Error:",
+      err.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Something went wrong on the server.",
+    });
+
+  }
+);
+
+
+// ======================================
+// START SERVER
+// ======================================
+
+const PORT =
+  process.env.PORT || 5000;
+
+
+app.listen(
+  PORT,
+  () => {
+
+    console.log(
+      "---------------------------------------"
+    );
+
+    console.log(
+      "GovGuide LK Backend"
+    );
+
+    console.log(
+      `Server running on port ${PORT}`
+    );
+
+    console.log(
+      `Local URL: http://localhost:${PORT}`
+    );
+
+    console.log(
+      "Allowed Frontend Origins:"
+    );
+
+    allowedOrigins.forEach(
+      (origin) =>
+        console.log(
+          `- ${origin}`
+        )
+    );
+
+    console.log(
+      "---------------------------------------"
+    );
+
+  }
+);
