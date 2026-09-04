@@ -5,11 +5,15 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
 const serviceRoutes = require(
-  "./modules/serviceDirectory/service.routes"
+    "./modules/serviceDirectory/service.routes"
 );
 
 const officeRoutes = require(
-  "./modules/officeDirectory/office.routes"
+    "./modules/officeDirectory/office.routes"
+);
+
+const inquiryRoutes = require(
+    "./modules/inquiryManagement/inquiry.routes"
 );
 
 
@@ -39,34 +43,50 @@ connectDB();
 // ======================================
 
 const allowedOrigins = [
-  process.env.CLIENT_URL,
-  "http://localhost:5173",
-  "http://localhost:5174",
+    process.env.CLIENT_URL,
+    "http://localhost:5173",
+    "http://localhost:5174",
 ].filter(Boolean);
 
 
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) {
-        return callback(null, true);
-      }
+    cors({
+        origin: function (
+            origin,
+            callback
+        ) {
+            if (!origin) {
+                return callback(
+                    null,
+                    true
+                );
+            }
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
 
-      console.log(
-        `Blocked by CORS: ${origin}`
-      );
+            if (
+                allowedOrigins.includes(
+                    origin
+                )
+            ) {
+                return callback(
+                    null,
+                    true
+                );
+            }
 
-      return callback(
-        new Error(
-          "This origin is not allowed by CORS."
-        )
-      );
-    },
-  })
+
+            console.log(
+                `Blocked by CORS: ${origin}`
+            );
+
+
+            return callback(
+                new Error(
+                    "This origin is not allowed by CORS."
+                )
+            );
+        },
+    })
 );
 
 
@@ -74,25 +94,28 @@ app.use(
 // MIDDLEWARE
 // ======================================
 
-app.use(express.json());
+app.use(
+    express.json()
+);
+
 
 app.use(
-  express.urlencoded({
-    extended: true,
-  })
+    express.urlencoded({
+        extended: true,
+    })
 );
 
 
 // ======================================
-// TEST ROUTE
+// ROOT ROUTE
 // ======================================
 
 app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message:
-      "GovGuide LK API is running successfully",
-  });
+    res.status(200).json({
+        success: true,
+        message:
+            "GovGuide LK API is running successfully",
+    });
 });
 
 
@@ -101,14 +124,15 @@ app.get("/", (req, res) => {
 // ======================================
 
 app.get(
-  "/api/health",
-  (req, res) => {
-    res.status(200).json({
-      success: true,
-      application: "GovGuide LK",
-      status: "Healthy",
-    });
-  }
+    "/api/health",
+    (req, res) => {
+        res.status(200).json({
+            success: true,
+            application:
+                "GovGuide LK",
+            status: "Healthy",
+        });
+    }
 );
 
 
@@ -117,13 +141,20 @@ app.get(
 // ======================================
 
 app.use(
-  "/api/services",
-  serviceRoutes
+    "/api/services",
+    serviceRoutes
 );
 
+
 app.use(
-  "/api/offices",
-  officeRoutes
+    "/api/offices",
+    officeRoutes
+);
+
+
+app.use(
+    "/api/inquiries",
+    inquiryRoutes
 );
 
 
@@ -131,12 +162,15 @@ app.use(
 // 404 HANDLER
 // ======================================
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "API endpoint not found.",
-  });
-});
+app.use(
+    (req, res) => {
+        res.status(404).json({
+            success: false,
+            message:
+                "API endpoint not found.",
+        });
+    }
+);
 
 
 // ======================================
@@ -144,18 +178,24 @@ app.use((req, res) => {
 // ======================================
 
 app.use(
-  (err, req, res, next) => {
-    console.error(
-      "Server Error:",
-      err.message
-    );
+    (
+        err,
+        req,
+        res,
+        next
+    ) => {
+        console.error(
+            "Server Error:",
+            err.message
+        );
 
-    res.status(500).json({
-      success: false,
-      message:
-        "Something went wrong on the server.",
-    });
-  }
+
+        res.status(500).json({
+            success: false,
+            message:
+                "Something went wrong on the server.",
+        });
+    }
 );
 
 
@@ -164,39 +204,45 @@ app.use(
 // ======================================
 
 const PORT =
-  process.env.PORT || 5000;
+    process.env.PORT ||
+    5000;
 
 
 app.listen(
-  PORT,
-  () => {
-    console.log(
-      "---------------------------------------"
-    );
+    PORT,
+    () => {
+        console.log(
+            "---------------------------------------"
+        );
 
-    console.log(
-      "GovGuide LK Backend"
-    );
+        console.log(
+            "GovGuide LK Backend"
+        );
 
-    console.log(
-      `Server running on port ${PORT}`
-    );
+        console.log(
+            `Server running on port ${PORT}`
+        );
 
-    console.log(
-      `Local URL: http://localhost:${PORT}`
-    );
+        console.log(
+            `Local URL: http://localhost:${PORT}`
+        );
 
-    console.log(
-      "Allowed Frontend Origins:"
-    );
+        console.log(
+            "Allowed Frontend Origins:"
+        );
 
-    allowedOrigins.forEach(
-      (origin) =>
-        console.log(`- ${origin}`)
-    );
 
-    console.log(
-      "---------------------------------------"
-    );
-  }
+        allowedOrigins.forEach(
+            (origin) => {
+                console.log(
+                    `- ${origin}`
+                );
+            }
+        );
+
+
+        console.log(
+            "---------------------------------------"
+        );
+    }
 );
