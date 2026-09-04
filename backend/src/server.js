@@ -8,6 +8,10 @@ const serviceRoutes = require(
   "./modules/serviceDirectory/service.routes"
 );
 
+const officeRoutes = require(
+  "./modules/officeDirectory/office.routes"
+);
+
 
 // ======================================
 // ENVIRONMENT CONFIGURATION
@@ -34,10 +38,6 @@ connectDB();
 // CORS CONFIGURATION
 // ======================================
 
-// We allow both common Vite development ports.
-// This avoids problems when Vite automatically
-// changes from 5173 to 5174.
-
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:5173",
@@ -48,9 +48,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-
-      // Allow requests without an origin
-      // such as Postman or direct API testing.
       if (!origin) {
         return callback(null, true);
       }
@@ -91,13 +88,11 @@ app.use(
 // ======================================
 
 app.get("/", (req, res) => {
-
   res.status(200).json({
     success: true,
     message:
       "GovGuide LK API is running successfully",
   });
-
 });
 
 
@@ -108,13 +103,11 @@ app.get("/", (req, res) => {
 app.get(
   "/api/health",
   (req, res) => {
-
     res.status(200).json({
       success: true,
       application: "GovGuide LK",
       status: "Healthy",
     });
-
   }
 );
 
@@ -128,19 +121,21 @@ app.use(
   serviceRoutes
 );
 
+app.use(
+  "/api/offices",
+  officeRoutes
+);
+
 
 // ======================================
 // 404 HANDLER
 // ======================================
 
 app.use((req, res) => {
-
   res.status(404).json({
     success: false,
-    message:
-      "API endpoint not found.",
+    message: "API endpoint not found.",
   });
-
 });
 
 
@@ -150,7 +145,6 @@ app.use((req, res) => {
 
 app.use(
   (err, req, res, next) => {
-
     console.error(
       "Server Error:",
       err.message
@@ -161,7 +155,6 @@ app.use(
       message:
         "Something went wrong on the server.",
     });
-
   }
 );
 
@@ -177,7 +170,6 @@ const PORT =
 app.listen(
   PORT,
   () => {
-
     console.log(
       "---------------------------------------"
     );
@@ -200,14 +192,11 @@ app.listen(
 
     allowedOrigins.forEach(
       (origin) =>
-        console.log(
-          `- ${origin}`
-        )
+        console.log(`- ${origin}`)
     );
 
     console.log(
       "---------------------------------------"
     );
-
   }
 );

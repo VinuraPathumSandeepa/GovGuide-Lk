@@ -14,9 +14,10 @@ import Home from "./pages/Home";
 
 import ServiceDirectory from "./modules/serviceDirectory/ServiceDirectory";
 
+import OfficeDirectory from "./modules/officeDirectory/OfficeDirectory";
+
 
 function App() {
-
   return (
     <BrowserRouter>
 
@@ -44,11 +45,7 @@ function App() {
           <Route
             path="/offices"
             element={
-              <ComingSoon
-                icon="📍"
-                title="Office Directory"
-                description="Find government offices and public service locations across Sri Lanka."
-              />
+              <OfficeDirectory />
             }
           />
 
