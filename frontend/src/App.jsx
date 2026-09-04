@@ -4,20 +4,28 @@ import {
   Routes,
 } from "react-router-dom";
 
+
 import Navbar from "./shared/Navbar";
 
 import Footer from "./shared/Footer";
 
-import ComingSoon from "./shared/ComingSoon";
-
 import Home from "./pages/Home";
 
+
 import ServiceDirectory from "./modules/serviceDirectory/ServiceDirectory";
+
 
 import OfficeDirectory from "./modules/officeDirectory/OfficeDirectory";
 
 
+import InquiryManagement from "./modules/inquiryManagement/InquiryManagement";
+
+
+import SmartServiceFinder from "./modules/smartFinder/SmartServiceFinder";
+
+
 function App() {
+
   return (
     <BrowserRouter>
 
@@ -30,7 +38,9 @@ function App() {
 
           <Route
             path="/"
-            element={<Home />}
+            element={
+              <Home />
+            }
           />
 
 
@@ -53,11 +63,7 @@ function App() {
           <Route
             path="/inquiries"
             element={
-              <ComingSoon
-                icon="💬"
-                title="Inquiry Management"
-                description="Submit public service inquiries and follow their progress."
-              />
+              <InquiryManagement />
             }
           />
 
@@ -65,14 +71,9 @@ function App() {
           <Route
             path="/finder"
             element={
-              <ComingSoon
-                icon="✨"
-                title="Smart Service Finder"
-                description="Answer a few questions to identify the public service you may need."
-              />
+              <SmartServiceFinder />
             }
           />
-
 
         </Routes>
 
