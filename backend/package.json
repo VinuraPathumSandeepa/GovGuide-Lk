@@ -1,0 +1,27 @@
+{
+  "name": "govguide-lk-backend",
+  "version": "1.0.0",
+  "description": "Backend API for GovGuide LK",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [
+    "govguide",
+    "sri-lanka",
+    "mern",
+    "hackathon"
+  ],
+  "author": "GovGuide LK Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^5.0.0",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
