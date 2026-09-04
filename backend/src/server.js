@@ -1,16 +1,39 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
+const express =
+  require("express");
 
-const connectDB = require("./config/db");
+const cors =
+  require("cors");
 
-const serviceRoutes = require(
-  "./modules/serviceDirectory/service.routes"
-);
+const dotenv =
+  require("dotenv");
 
-const officeRoutes = require(
-  "./modules/officeDirectory/office.routes"
-);
+
+const connectDB =
+  require("./config/db");
+
+
+const serviceRoutes =
+  require(
+    "./modules/serviceDirectory/service.routes"
+  );
+
+
+const officeRoutes =
+  require(
+    "./modules/officeDirectory/office.routes"
+  );
+
+
+const inquiryRoutes =
+  require(
+    "./modules/inquiryManagement/inquiry.routes"
+  );
+
+
+const finderRoutes =
+  require(
+    "./modules/smartFinder/finder.routes"
+  );
 
 
 // ======================================
@@ -24,7 +47,8 @@ dotenv.config();
 // CREATE EXPRESS APPLICATION
 // ======================================
 
-const app = express();
+const app =
+  express();
 
 
 // ======================================
@@ -40,25 +64,63 @@ connectDB();
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  "http://localhost:5173",
-  "http://localhost:5174",
 ].filter(Boolean);
 
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: function (
+      origin,
+      callback
+    ) {
+
+      // Allow tools such as Postman
+      // and direct server requests.
+
       if (!origin) {
-        return callback(null, true);
+        return callback(
+          null,
+          true
+        );
       }
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+
+      // Allow configured deployed
+      // frontend.
+
+      if (
+        allowedOrigins.includes(
+          origin
+        )
+      ) {
+        return callback(
+          null,
+          true
+        );
       }
+
+
+      // Allow any localhost Vite port
+      // during hackathon development.
+
+      const isLocalhost =
+        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(
+          origin
+        );
+
+
+      if (isLocalhost) {
+        return callback(
+          null,
+          true
+        );
+      }
+
 
       console.log(
         `Blocked by CORS: ${origin}`
       );
+
 
       return callback(
         new Error(
@@ -74,7 +136,10 @@ app.use(
 // MIDDLEWARE
 // ======================================
 
-app.use(express.json());
+app.use(
+  express.json()
+);
+
 
 app.use(
   express.urlencoded({
@@ -84,16 +149,24 @@ app.use(
 
 
 // ======================================
-// TEST ROUTE
+// ROOT ROUTE
 // ======================================
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message:
-      "GovGuide LK API is running successfully",
-  });
-});
+app.get(
+  "/",
+  (req, res) => {
+
+    res.status(200).json({
+      success: true,
+
+      application:
+        "GovGuide LK",
+
+      message:
+        "GovGuide LK API is running successfully",
+    });
+  }
+);
 
 
 // ======================================
@@ -103,23 +176,33 @@ app.get("/", (req, res) => {
 app.get(
   "/api/health",
   (req, res) => {
+
     res.status(200).json({
       success: true,
-      application: "GovGuide LK",
-      status: "Healthy",
+
+      application:
+        "GovGuide LK",
+
+      status:
+        "Healthy",
     });
   }
 );
 
 
 // ======================================
-// APPLICATION ROUTES
+// MEMBER 1 - SERVICE DIRECTORY
 // ======================================
 
 app.use(
   "/api/services",
   serviceRoutes
 );
+
+
+// ======================================
+// MEMBER 2 - OFFICE DIRECTORY
+// ======================================
 
 app.use(
   "/api/offices",
@@ -128,15 +211,40 @@ app.use(
 
 
 // ======================================
+// MEMBER 3 - INQUIRIES
+// ======================================
+
+app.use(
+  "/api/inquiries",
+  inquiryRoutes
+);
+
+
+// ======================================
+// MEMBER 4 - SMART FINDER
+// ======================================
+
+app.use(
+  "/api/finder",
+  finderRoutes
+);
+
+
+// ======================================
 // 404 HANDLER
 // ======================================
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "API endpoint not found.",
-  });
-});
+app.use(
+  (req, res) => {
+
+    res.status(404).json({
+      success: false,
+
+      message:
+        "API endpoint not found.",
+    });
+  }
+);
 
 
 // ======================================
@@ -144,14 +252,22 @@ app.use((req, res) => {
 // ======================================
 
 app.use(
-  (err, req, res, next) => {
+  (
+    err,
+    req,
+    res,
+    next
+  ) => {
+
     console.error(
       "Server Error:",
       err.message
     );
 
+
     res.status(500).json({
       success: false,
+
       message:
         "Something went wrong on the server.",
     });
@@ -164,12 +280,14 @@ app.use(
 // ======================================
 
 const PORT =
-  process.env.PORT || 5000;
+  process.env.PORT ||
+  5000;
 
 
 app.listen(
   PORT,
   () => {
+
     console.log(
       "---------------------------------------"
     );
@@ -187,16 +305,28 @@ app.listen(
     );
 
     console.log(
-      "Allowed Frontend Origins:"
+      "Modules:"
     );
 
-    allowedOrigins.forEach(
-      (origin) =>
-        console.log(`- ${origin}`)
+    console.log(
+      "- Service Directory"
+    );
+
+    console.log(
+      "- Office Directory"
+    );
+
+    console.log(
+      "- Inquiry Management"
+    );
+
+    console.log(
+      "- Smart Service Finder"
     );
 
     console.log(
       "---------------------------------------"
     );
+
   }
 );
